@@ -7,7 +7,7 @@ export default defineConfig({
     port: 5173,
   },
   preview: {
-    allowedHosts: ['training-hour-frontend-production.up.railway.app'],
+    allowedHosts: true,
   },
   build: {
     rollupOptions: {
