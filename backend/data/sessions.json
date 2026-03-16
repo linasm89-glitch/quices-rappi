@@ -1,0 +1,89 @@
+[
+  {
+    "id": "162ada76-0455-4ddd-bfa8-c9a38e259242",
+    "name": "Quiz Training Hour Marzo 11/2026",
+    "date": "2026-03-11",
+    "questions": [
+      {
+        "id": "24536af2-fe77-418d-9fcc-0e7d22b89dd1",
+        "order": 0,
+        "title": "¿Qué aliados reciben los beneficios al ingresar a Rappi?",
+        "options": [
+          {
+            "id": "a",
+            "text": "Los que llevan menos de 90 días desde su activación"
+          },
+          {
+            "id": "b",
+            "text": "Los que llevan menos de 30 días desde su activación"
+          },
+          {
+            "id": "c",
+            "text": "Los que llevan menos de 90 días desde la firma del contrato "
+          },
+          {
+            "id": "d",
+            "text": "Los que llevan menos de 60 días desde su activación"
+          }
+        ],
+        "correctOptionId": "a",
+        "feedback": "Los días se cuentan desde la primera fecha de conexión de la tienda"
+      },
+      {
+        "id": "ad3cadf9-4385-4773-bf98-f1aede12fd54",
+        "order": 1,
+        "title": "¿Dónde puedo encontrar estos beneficios?",
+        "options": [
+          {
+            "id": "a",
+            "text": "Portal Partners"
+          },
+          {
+            "id": "b",
+            "text": "Portal Manager"
+          },
+          {
+            "id": "c",
+            "text": "Rappi Aliados"
+          },
+          {
+            "id": "d",
+            "text": "CMS"
+          }
+        ],
+        "correctOptionId": "a",
+        "feedback": ""
+      },
+      {
+        "id": "db3096b8-cd77-4699-aeac-7f2c53de8979",
+        "order": 2,
+        "title": "¿Todos los aliados nuevos reciben estos beneficios?",
+        "options": [
+          {
+            "id": "a",
+            "text": "Verdadero"
+          },
+          {
+            "id": "b",
+            "text": "Falso"
+          },
+          {
+            "id": "c",
+            "text": "Depende"
+          },
+          {
+            "id": "d",
+            "text": "NA"
+          }
+        ],
+        "correctOptionId": "b",
+        "feedback": "No todos los aliados nuevos reciben este beneficio"
+      }
+    ],
+    "status": "draft",
+    "participants": {},
+    "scores": {},
+    "createdAt": "2026-03-16T03:05:00.947Z",
+    "updatedAt": "2026-03-16T03:05:00.947Z"
+  }
+]
