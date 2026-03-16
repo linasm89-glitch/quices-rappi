@@ -1,4 +1,4 @@
-jsimport { defineConfig } from 'vite'
+import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
 export default defineConfig({
@@ -22,10 +22,3 @@ export default defineConfig({
     chunkSizeWarningLimit: 600,
   }
 })
-```
-
-Luego en terminal:
-```
-git add frontend/vite.config.js
-git commit -m "allow railway host in vite preview"
-git push
