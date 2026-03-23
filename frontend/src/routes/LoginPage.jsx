@@ -1,13 +1,25 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { User, Mail, ArrowRight, AlertCircle, Wifi, WifiOff } from 'lucide-react'
+import { AlertCircle, Wifi, WifiOff } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext.jsx'
 import { useSocket } from '../contexts/SocketContext.jsx'
-import { validateName, validateRappiEmail } from '../lib/validators.js'
 import RappiLogo from '../components/ui/RappiLogo.jsx'
 
-// ─── Sub-components ────────────────────────────────────────────────────────
+// ─── Google Icon ─────────────────────────────────────────────────────────────
+
+function GoogleIcon() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+      <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+      <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+      <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+      <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+    </svg>
+  )
+}
+
+// ─── Connection Badge ─────────────────────────────────────────────────────────
 
 function ConnectionBadge({ connected }) {
   return (
@@ -30,122 +42,28 @@ function ConnectionBadge({ connected }) {
   )
 }
 
-function InputField({ id, label, type = 'text', value, onChange, placeholder, error, icon: Icon, disabled }) {
-  return (
-    <div className="flex flex-col gap-1.5">
-      <label htmlFor={id} className="text-sm font-semibold text-gray-700">
-        {label}
-      </label>
-
-      <div className="relative">
-        {Icon && (
-          <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none">
-            <Icon size={17} />
-          </div>
-        )}
-        <input
-          id={id}
-          type={type}
-          value={value}
-          onChange={onChange}
-          placeholder={placeholder}
-          disabled={disabled}
-          autoComplete={type === 'email' ? 'email' : 'name'}
-          inputMode={type === 'email' ? 'email' : 'text'}
-          className={`
-            w-full rounded-xl border bg-white px-4 py-3.5 text-sm text-gray-900 placeholder-gray-400
-            transition-all duration-150 outline-none
-            ${Icon ? 'pl-10' : ''}
-            ${error
-              ? 'border-red-400 ring-2 ring-red-100 focus:ring-red-200'
-              : 'border-gray-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-100'
-            }
-            disabled:bg-gray-50 disabled:text-gray-400 disabled:cursor-not-allowed
-          `}
-        />
-      </div>
-
-      <AnimatePresence mode="wait">
-        {error && (
-          <motion.p
-            key="error"
-            initial={{ opacity: 0, height: 0, y: -4 }}
-            animate={{ opacity: 1, height: 'auto', y: 0 }}
-            exit={{ opacity: 0, height: 0 }}
-            transition={{ duration: 0.18 }}
-            className="flex items-center gap-1.5 text-xs text-red-600 font-medium overflow-hidden"
-          >
-            <AlertCircle size={12} className="flex-shrink-0" />
-            {error}
-          </motion.p>
-        )}
-      </AnimatePresence>
-    </div>
-  )
-}
-
-// ─── LoginPage ─────────────────────────────────────────────────────────────
+// ─── LoginPage ────────────────────────────────────────────────────────────────
 
 export default function LoginPage() {
-  const navigate    = useNavigate()
-  const { login }   = useAuth()
+  const navigate      = useNavigate()
+  const { login }     = useAuth()
   const { connected } = useSocket()
 
-  const [name,       setName]       = useState('')
-  const [email,      setEmail]      = useState('')
-  const [nameError,  setNameError]  = useState('')
-  const [emailError, setEmailError] = useState('')
-  const [serverError, setServerError] = useState('')
-  const [isLoading,  setIsLoading]  = useState(false)
+  const [error, setError]         = useState('')
+  const [isLoading, setIsLoading] = useState(false)
 
-  const clearErrors = () => {
-    setNameError('')
-    setEmailError('')
-    setServerError('')
-  }
-
-  const handleNameChange = (e) => {
-    setName(e.target.value)
-    if (nameError) setNameError('')
-    if (serverError) setServerError('')
-  }
-
-  const handleEmailChange = (e) => {
-    setEmail(e.target.value)
-    if (emailError) setEmailError('')
-    if (serverError) setServerError('')
-  }
-
-  const handleSubmit = async (e) => {
-    e.preventDefault()
-    clearErrors()
-
-    // Client-side validation
-    const nameValidation  = validateName(name)
-    const emailValidation = validateRappiEmail(email)
-
-    let hasError = false
-    if (!nameValidation.valid) {
-      setNameError(nameValidation.error)
-      hasError = true
-    }
-    if (!emailValidation.valid) {
-      setEmailError(emailValidation.error)
-      hasError = true
-    }
-    if (hasError) return
+  const handleGoogleLogin = async () => {
+    setError('')
 
     if (!connected) {
-      setServerError('Sin conexión al servidor. Verifica tu internet e intenta de nuevo.')
+      setError('Sin conexión al servidor. Verifica tu internet e intenta de nuevo.')
       return
     }
 
     setIsLoading(true)
-
     try {
-      const user = await login(name.trim(), email.trim().toLowerCase())
+      const user = await login()
 
-      // Navigate based on role
       if (user.role === 'admin') {
         navigate('/admin', { replace: true })
       } else if (user.role === 'trainer') {
@@ -154,7 +72,7 @@ export default function LoginPage() {
         navigate('/play', { replace: true })
       }
     } catch (err) {
-      setServerError(err.message || 'Error al ingresar. Intenta de nuevo.')
+      setError(err.message || 'Error al ingresar. Intenta de nuevo.')
     } finally {
       setIsLoading(false)
     }
@@ -163,10 +81,7 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen bg-white flex flex-col">
       {/* Background decoration */}
-      <div
-        className="absolute inset-0 pointer-events-none overflow-hidden"
-        aria-hidden="true"
-      >
+      <div className="absolute inset-0 pointer-events-none overflow-hidden" aria-hidden="true">
         <div
           className="absolute -top-40 -right-40 w-96 h-96 rounded-full opacity-5"
           style={{ background: '#FF441F' }}
@@ -181,9 +96,7 @@ export default function LoginPage() {
       <header className="relative z-10 px-6 pt-safe-top pt-6 pb-4 flex items-center justify-between">
         <div className="flex items-center gap-2">
           <RappiLogo size={32} />
-          <span className="font-extrabold text-gray-900 text-base tracking-tight">
-            Rappi
-          </span>
+          <span className="font-extrabold text-gray-900 text-base tracking-tight">Rappi</span>
         </div>
         <ConnectionBadge connected={connected} />
       </header>
@@ -206,7 +119,6 @@ export default function LoginPage() {
               draggable={false}
             />
           </div>
-
           <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight leading-tight">
             The Training Hour
           </h1>
@@ -225,93 +137,62 @@ export default function LoginPage() {
           <div className="bg-white rounded-2xl shadow-card-lg border border-gray-100 p-7">
             <h2 className="text-xl font-bold text-gray-900 mb-1">Únete a la sesión</h2>
             <p className="text-sm text-gray-500 mb-6">
-              Ingresa tus datos para participar
+              Ingresa con tu cuenta corporativa de Google
             </p>
 
-            <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-5">
-              <InputField
-                id="name"
-                label="Nombre completo"
-                value={name}
-                onChange={handleNameChange}
-                placeholder="Ej: María García"
-                error={nameError}
-                icon={User}
-                disabled={isLoading}
-              />
+            {/* Error message */}
+            <AnimatePresence>
+              {error && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  exit={{ opacity: 0, height: 0 }}
+                  className="overflow-hidden mb-4"
+                >
+                  <div className="flex items-start gap-2.5 bg-red-50 border border-red-200 rounded-xl px-4 py-3">
+                    <AlertCircle size={15} className="text-red-500 flex-shrink-0 mt-0.5" />
+                    <p className="text-sm text-red-700 font-medium leading-snug">{error}</p>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
 
-              <InputField
-                id="email"
-                label="Correo corporativo"
-                type="email"
-                value={email}
-                onChange={handleEmailChange}
-                placeholder="nombre@rappi.com"
-                error={emailError}
-                icon={Mail}
-                disabled={isLoading}
-              />
+            {/* Google Sign-In button */}
+            <motion.button
+              type="button"
+              onClick={handleGoogleLogin}
+              disabled={isLoading || !connected}
+              whileHover={!isLoading && connected ? { scale: 1.015 } : {}}
+              whileTap={!isLoading && connected ? { scale: 0.975 } : {}}
+              className={`
+                w-full flex items-center justify-center gap-3
+                bg-white border-2 border-gray-200 rounded-xl
+                py-3.5 px-6 text-gray-700 font-semibold text-base
+                transition-all duration-200
+                hover:border-gray-300 hover:shadow-md
+                disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:shadow-none
+              `}
+            >
+              {isLoading ? (
+                <>
+                  <motion.span
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 0.9, ease: 'linear', repeat: Infinity }}
+                    className="inline-block w-5 h-5 border-2 border-gray-400 border-t-transparent rounded-full"
+                  />
+                  <span>Verificando…</span>
+                </>
+              ) : (
+                <>
+                  <GoogleIcon />
+                  <span>Entrar con Google</span>
+                </>
+              )}
+            </motion.button>
 
-              {/* Server error */}
-              <AnimatePresence>
-                {serverError && (
-                  <motion.div
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: 'auto' }}
-                    exit={{ opacity: 0, height: 0 }}
-                    className="overflow-hidden"
-                  >
-                    <div className="flex items-start gap-2.5 bg-red-50 border border-red-200 rounded-xl px-4 py-3">
-                      <AlertCircle size={15} className="text-red-500 flex-shrink-0 mt-0.5" />
-                      <p className="text-sm text-red-700 font-medium leading-snug">{serverError}</p>
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-
-              {/* Submit button */}
-              <motion.button
-                type="submit"
-                disabled={isLoading || !connected}
-                whileHover={!isLoading ? { scale: 1.015 } : {}}
-                whileTap={!isLoading ? { scale: 0.975 } : {}}
-                className={`
-                  relative w-full flex items-center justify-center gap-2.5
-                  py-3.5 px-6 rounded-xl text-white font-bold text-base
-                  transition-all duration-200 shadow-orange
-                  ${isLoading || !connected
-                    ? 'opacity-60 cursor-not-allowed'
-                    : 'hover:shadow-lg active:shadow-md'
-                  }
-                `}
-                style={{
-                  background: isLoading || !connected
-                    ? '#FF441F'
-                    : 'linear-gradient(135deg, #FF441F 0%, #FF6E4D 100%)',
-                }}
-              >
-                {isLoading ? (
-                  <>
-                    <motion.span
-                      animate={{ rotate: 360 }}
-                      transition={{ duration: 0.9, ease: 'linear', repeat: Infinity }}
-                      className="inline-block w-5 h-5 border-2 border-white border-t-transparent rounded-full"
-                    />
-                    <span>Ingresando…</span>
-                  </>
-                ) : (
-                  <>
-                    <span>Ingresar</span>
-                    <motion.span
-                      animate={{ x: [0, 3, 0] }}
-                      transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
-                    >
-                      <ArrowRight size={18} />
-                    </motion.span>
-                  </>
-                )}
-              </motion.button>
-            </form>
+            <p className="mt-4 text-center text-xs text-gray-400">
+              Sólo cuentas <span className="font-semibold">@rappi.com</span>
+            </p>
           </div>
         </motion.div>
       </main>
